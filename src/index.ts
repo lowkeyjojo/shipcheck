@@ -6,6 +6,7 @@ import { commandInit } from './commands/init';
 import { commandScan } from './commands/scan';
 import { commandReport } from './commands/report';
 import { commandCodex } from './commands/codex';
+import { resolvePreset } from './presets';
 import pkg from '../package.json';
 
 const program = new Command();
@@ -19,10 +20,12 @@ program
   .command('init')
   .description('Initialise ShipCheck in the current directory')
   .option('-d, --dir <path>', 'Target directory to initialise', process.cwd())
-  .action((opts: { dir: string }) => {
+  .option('-p, --preset <name>', 'Project preset: generic, node, roblox', 'generic')
+  .action((opts: { dir: string; preset: string }) => {
     const targetDir = path.resolve(opts.dir);
+    const preset = resolvePreset(opts.preset);
     logger.banner(pkg.version);
-    commandInit(targetDir).catch((err: Error) => {
+    commandInit(targetDir, preset).catch((err: Error) => {
       logger.error(err.message);
       process.exit(1);
     });

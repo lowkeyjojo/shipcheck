@@ -2,6 +2,8 @@ import path from 'path';
 import ora from 'ora';
 import { runAllChecks, CheckResult } from '../checks';
 import { writeJson } from '../utils/fs';
+import { readConfig } from '../utils/config';
+import { getPreset, PresetSuggestion } from '../presets';
 import { logger } from '../utils/logger';
 
 export interface ScanData {
@@ -10,9 +12,14 @@ export interface ScanData {
   results: CheckResult[];
   passed: number;
   total: number;
+  preset: string;
+  suggestions: PresetSuggestion[];
 }
 
 export async function commandScan(targetDir: string): Promise<ScanData> {
+  const config = await readConfig(targetDir);
+  const preset = getPreset(config?.preset ?? 'generic');
+
   const spinner = ora({ text: `Scanning ${targetDir} ...`, color: 'cyan' }).start();
 
   let results: CheckResult[];
@@ -25,7 +32,7 @@ export async function commandScan(targetDir: string): Promise<ScanData> {
   }
 
   logger.blank();
-  logger.section(`Scanning ${targetDir}`);
+  logger.section(`Scanning ${targetDir}  [preset: ${preset.name}]`);
   logger.blank();
 
   for (const r of results) {
@@ -41,6 +48,15 @@ export async function commandScan(targetDir: string): Promise<ScanData> {
 
   logger.summary(passed, total);
 
+  if (preset.suggestions.length > 0) {
+    logger.section(`${preset.displayName} Preset Suggestions`);
+    logger.blank();
+    for (const s of preset.suggestions) {
+      logger.info(`${s.label}`);
+    }
+    logger.blank();
+  }
+
   if (passed < total) {
     logger.info('Run `shipcheck report` to generate a full report with fix suggestions.');
   } else {
@@ -55,6 +71,8 @@ export async function commandScan(targetDir: string): Promise<ScanData> {
     results,
     passed,
     total,
+    preset: preset.name,
+    suggestions: preset.suggestions,
   };
 
   const cachePath = path.join(targetDir, '.shipcheck', 'last-scan.json');

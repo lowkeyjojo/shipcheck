@@ -18,8 +18,18 @@ export async function commandReport(targetDir: string): Promise<void> {
 
   const scanData = await commandScan(targetDir);
 
-  const checklistPath = await generateChecklist(targetDir, scanData.results);
-  const reportPath = await generateReport(targetDir, scanData.results);
+  const checklistPath = await generateChecklist(
+    targetDir,
+    scanData.results,
+    scanData.preset,
+    scanData.suggestions
+  );
+  const reportPath = await generateReport(
+    targetDir,
+    scanData.results,
+    scanData.preset,
+    scanData.suggestions
+  );
 
   const passed = scanData.results.filter((r) => r.passed).length;
   const total = scanData.results.length;

@@ -1,35 +1,33 @@
 import path from 'path';
-import { writeJson, exists } from '../utils/fs';
+import { exists } from '../utils/fs';
+import { readConfig, writeConfig } from '../utils/config';
+import { PresetName } from '../presets';
 import { logger } from '../utils/logger';
 
-interface ShipCheckConfig {
-  version: string;
-  createdAt: string;
-  targetDir: string;
-}
+export async function commandInit(targetDir: string, preset: PresetName = 'generic'): Promise<void> {
+  const configFile = path.join(targetDir, '.shipcheck', 'config.json');
+  const existing = await readConfig(targetDir);
+  const alreadyExists = await exists(configFile);
 
-export async function commandInit(targetDir: string): Promise<void> {
-  const configPath = path.join(targetDir, '.shipcheck', 'config.json');
-  const alreadyExists = await exists(configPath);
-
-  if (alreadyExists) {
-    logger.warn('ShipCheck is already initialised in this directory.');
-    logger.info(`Config: ${configPath}`);
-    logger.blank();
-    return;
-  }
-
-  const config: ShipCheckConfig = {
+  await writeConfig(targetDir, {
     version: '0.1.0',
     createdAt: new Date().toISOString(),
     targetDir,
-  };
+    preset,
+  });
 
-  await writeJson(configPath, config);
+  if (alreadyExists && existing) {
+    if (existing.preset === preset) {
+      logger.success(`ShipCheck already set to preset: ${preset} (config refreshed)`);
+    } else {
+      logger.success(`Preset changed: ${existing.preset} → ${preset}`);
+    }
+  } else {
+    logger.success(`ShipCheck initialised! (preset: ${preset})`);
+  }
 
-  logger.success('ShipCheck initialised!');
   logger.blank();
-  logger.info(`Config saved to: ${path.relative(process.cwd(), configPath)}`);
+  logger.info(`Config saved to: ${path.relative(process.cwd(), configFile)}`);
   logger.blank();
   console.log('  Next steps:');
   console.log('');

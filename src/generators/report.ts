@@ -1,11 +1,14 @@
 import { format } from 'date-fns';
 import { CheckResult } from '../checks';
+import { PresetSuggestion } from '../presets';
 import { writeText } from '../utils/fs';
 import path from 'path';
 
 export async function generateReport(
   targetDir: string,
-  results: CheckResult[]
+  results: CheckResult[],
+  preset: string,
+  suggestions: PresetSuggestion[]
 ): Promise<string> {
   const passed = results.filter((r) => r.passed).length;
   const total = results.length;
@@ -19,6 +22,7 @@ export async function generateReport(
     `|---|---|`,
     `| Generated | ${date} |`,
     `| Scanned path | \`${targetDir}\` |`,
+    `| Preset | \`${preset}\` |`,
     `| Score | ${passed} / ${total} (${score}%) |`,
     `| Status | ${passed === total ? '✅ Ready to ship' : passed >= total / 2 ? '⚠️ Needs attention' : '❌ Not ready'} |`,
     '',
@@ -58,6 +62,21 @@ export async function generateReport(
     lines.push('');
     lines.push('Your project looks ready to ship. Double-check your changelog and version bump before releasing.');
     lines.push('');
+  }
+
+  if (suggestions.length > 0) {
+    lines.push('---');
+    lines.push('');
+    lines.push(`## ${preset.charAt(0).toUpperCase() + preset.slice(1)} Preset Suggestions`);
+    lines.push('');
+    lines.push('These are advisory reminders — review before shipping:');
+    lines.push('');
+    for (const s of suggestions) {
+      lines.push(`### 💡 ${s.label}`);
+      lines.push('');
+      lines.push(s.detail);
+      lines.push('');
+    }
   }
 
   lines.push('---');

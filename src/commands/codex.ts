@@ -17,15 +17,20 @@ export async function commandCodex(targetDir: string): Promise<void> {
 
   const scanData = await commandScan(targetDir);
 
-  const codexPath = await generateCodex(targetDir, scanData.results);
+  const codexPath = await generateCodex(
+    targetDir,
+    scanData.results,
+    scanData.preset,
+    scanData.suggestions
+  );
 
   const failed = scanData.results.filter((r) => !r.passed).length;
 
   logger.blank();
   if (failed === 0) {
-    logger.success('All checks passed — no tasks to generate.');
+    logger.success(`All checks passed — ${scanData.suggestions.length} preset reminder(s) included.`);
   } else {
-    logger.success(`Codex task file generated (${failed} task${failed !== 1 ? 's' : ''})`);
+    logger.success(`Codex task file generated (${failed} required task${failed !== 1 ? 's' : ''}, ${scanData.suggestions.length} preset reminder${scanData.suggestions.length !== 1 ? 's' : ''})`);
   }
   logger.blank();
   logger.info(`Tasks: ${path.relative(process.cwd(), codexPath)}`);

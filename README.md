@@ -40,14 +40,43 @@ npx shipcheck scan
 
 ---
 
+## Presets
+
+ShipCheck supports project presets so scan output and generated files are tailored to your project type.
+
+| Preset | Description |
+|---|---|
+| `generic` | General release reminders for any project (default) |
+| `node` | Node.js / npm package and CLI release suggestions |
+| `roblox` | Roblox experience release suggestions |
+
+Select a preset when running `init`:
+
+```bash
+shipcheck init --preset generic
+shipcheck init --preset node
+shipcheck init --preset roblox
+```
+
+The preset is stored in `.shipcheck/config.json`. All subsequent `scan`, `report`, and `codex` commands read it automatically. If no config exists, `generic` is used as the fallback.
+
+---
+
 ## Commands
 
 ### `shipcheck init`
 
-Initialises ShipCheck in the current directory. Creates a `.shipcheck/config.json` file.
+Initialises ShipCheck in the current directory. Creates a `.shipcheck/config.json` file with the selected preset.
 
 ```bash
+# Default (generic preset)
 shipcheck init
+
+# Node.js project
+shipcheck init --preset node
+
+# Roblox experience
+shipcheck init --preset roblox
 ```
 
 ---
@@ -65,7 +94,7 @@ Example output:
 ```
   ⛵  ShipCheck v0.1.0  — Release Readiness Scanner
 
-  Scanning /your-project ...
+  Scanning /your-project  [preset: node]
 
   ✅  README.md          README.md found
   ✅  LICENSE            LICENSE found
@@ -77,6 +106,13 @@ Example output:
 
   ─────────────────────────────────
   5 / 7 checks passed
+
+  Node.js Preset Suggestions
+
+  ℹ️  Confirm package.json scripts
+  ℹ️  Run npm pack --dry-run
+  ℹ️  Confirm README has install instructions
+  ...
 ```
 
 To scan a different directory:
