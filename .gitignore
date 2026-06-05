@@ -1,3 +1,11 @@
+# ShipCheck build output
+dist/
+
+# ShipCheck generated output (scanned projects keep their own copies)
+.shipcheck/
+.codex/
+RELEASE_CHECKLIST.md
+
 # Logs
 logs
 *.log

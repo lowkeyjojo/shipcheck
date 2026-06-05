@@ -1,0 +1,49 @@
+{
+  "name": "shipcheck",
+  "version": "0.1.0",
+  "description": "A release-readiness CLI that scans projects, generates checklists, and creates Codex-friendly tasks before shipping.",
+  "author": "jojo",
+  "license": "MIT",
+  "keywords": ["cli", "release", "checklist", "shipcheck", "codex", "open-source"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lowkeyjojo/shipcheck.git"
+  },
+  "type": "commonjs",
+  "main": "dist/index.js",
+  "bin": {
+    "shipcheck": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/index.ts",
+    "lint": "eslint src --ext .ts",
+    "clean": "node -e \"const fs=require('fs');fs.rmSync('dist',{recursive:true,force:true});\"",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "chalk": "4.1.2",
+    "commander": "^12.1.0",
+    "date-fns": "^4.1.0",
+    "fs-extra": "^11.2.0",
+    "ora": "5.4.1"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^22.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "eslint": "^8.57.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.5.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
